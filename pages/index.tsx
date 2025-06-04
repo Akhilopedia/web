@@ -1,3 +1,12 @@
+import Layout from "@/components/layout";
+import HeroSection from "@/components/Hero";
+import FeaturesSection from "@/components/Features";
+
 export default function Home() {
-  return <div className="text-red-500">Hello world.</div>;
+  return (
+    <Layout>
+      <HeroSection />
+      <FeaturesSection />
+    </Layout>
+  );
 }
