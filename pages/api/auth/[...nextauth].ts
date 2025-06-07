@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const authOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
@@ -16,7 +17,7 @@ export const authOptions = {
   },
   callbacks: {
     async redirect({ url, baseUrl }: any) {
-      return `${baseUrl}/dashboard`; // ✅ MUST be an absolute URL
+      return `${baseUrl}/dashboard`;
     },
     async signIn({ user, account }: any) {
       if (!user.email) return false;
