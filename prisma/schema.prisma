@@ -19,7 +19,7 @@ model User {
   username  String
   email     String   @unique
   phone     String?  @unique
-  password  String
+  password  String?
   googleId  String?
   profile   String?
   createdAt DateTime @default(now())
