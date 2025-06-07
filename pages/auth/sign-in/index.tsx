@@ -8,7 +8,6 @@ export async function getServerSideProps() {
 export default function SignIn({ providers }: any) {
   return (
     <div>
-      <h1>Sign in</h1>
       {Object.values(providers).map((provider: any) => (
         <div key={provider.name}>
           <button onClick={() => signIn(provider.id)}>

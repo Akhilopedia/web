@@ -1,7 +1,10 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import { PrismaClient } from "@prisma/client";
 
-export default NextAuth({
+const prisma = new PrismaClient();
+
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
@@ -11,4 +14,35 @@ export default NextAuth({
   pages: {
     signIn: "/auth/sign-in",
   },
-});
+  callbacks: {
+    async redirect({ url, baseUrl }: any) {
+      return `${baseUrl}/dashboard`; // ✅ MUST be an absolute URL
+    },
+    async signIn({ user, account }: any) {
+      if (!user.email) return false;
+
+      const existingUser = await prisma.user.findUnique({
+        where: { email: user.email },
+      });
+
+      if (!existingUser) {
+        const generatedUsername =
+          user.email.split("@")[0] + "-" + Math.floor(Math.random() * 1000);
+
+        await prisma.user.create({
+          data: {
+            fullName: user.name || "Google User",
+            username: generatedUsername,
+            email: user.email,
+            googleId: account?.providerAccountId,
+            profile: user.image,
+          },
+        });
+      }
+
+      return true;
+    },
+  },
+};
+
+export default NextAuth(authOptions);
