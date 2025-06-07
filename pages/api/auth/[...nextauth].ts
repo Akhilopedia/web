@@ -9,6 +9,6 @@ export default NextAuth({
     }),
   ],
   pages: {
-    signIn: "/auth/signin", // Customize your signin page if needed
+    signIn: "/auth/sign-in",
   },
 });
