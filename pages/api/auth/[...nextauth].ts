@@ -17,7 +17,7 @@ export const authOptions = {
   },
   callbacks: {
     async redirect({ url, baseUrl }: any) {
-      return `${baseUrl}/dashboard`;
+      return `${baseUrl}/`;
     },
     async signIn({ user, account }: any) {
       if (!user.email) return false;

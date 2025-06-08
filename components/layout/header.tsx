@@ -1,82 +1,203 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { Menu, X, User2, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import GoogleSignInButton from "../SignIn/Google";
+import { useAuthStore } from "@/stores/authStatus";
+import { signOut } from "next-auth/react";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { session: userSession } = useAuthStore();
+
+  console.log("userSession", userSession);
+
+  const navigationItems = [
+    { name: "Explore", href: "#explore" },
+    { name: "Upload", href: "#upload" },
+    { name: "Community", href: "#community" },
+  ];
+
+  const getUserInitials = (name: string) => {
+    console.log("name", name);
+    return name
+      ?.split(" ")
+      ?.map((n) => n[0])
+      ?.join("")
+      ?.toUpperCase()
+      ?.slice(0, 2);
+  };
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <div className="flex-shrink-0 flex items-center">
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              AkhiloPedia
-            </span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a
-              href="#"
-              className="text-gray-600 hover:text-blue-600 transition-colors">
-              Explore
-            </a>
-            <a
-              href="#"
-              className="text-gray-600 hover:text-blue-600 transition-colors">
-              Upload
-            </a>
-            <a
-              href="#"
-              className="text-gray-600 hover:text-blue-600 transition-colors">
-              Community
-            </a>
-            <div className="flex space-x-4">
-              {/* <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-purple-600 transition-colors">
-                Sign In
-              </button> */}
-              <GoogleSignInButton />
+    <>
+      <div className="navbar bg-base-100 shadow-sm sticky top-0 z-50 backdrop-blur-sm bg-base-100/90">
+        <div className="navbar-start">
+          {/* Mobile menu */}
+          <div className="dropdown lg:hidden">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-ghost btn-circle"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </div>
+            {isMenuOpen && (
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-lg border">
+                {navigationItems.map((item) => (
+                  <li key={item.name}>
+                    <a
+                      href={item.href}
+                      className="text-sm font-medium"
+                      onClick={() => setIsMenuOpen(false)}>
+                      {item.name}
+                    </a>
+                  </li>
+                ))}
+                <div className="divider my-2"></div>
+                {userSession ? (
+                  <li>
+                    <div className="flex items-center space-x-2 p-2">
+                      <div className="avatar">
+                        <div className="w-8 rounded-full">
+                          <img
+                            src={userSession?.image}
+                            alt={userSession?.name}
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                              const nextSibling = e.currentTarget
+                                .nextElementSibling as HTMLDivElement | null;
+                              if (nextSibling?.style) {
+                                nextSibling.style.display = "flex";
+                              }
+                            }}
+                          />
+                          <div
+                            className="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center text-xs font-medium"
+                            style={{ display: "block" }}>
+                            {getUserInitials(userSession?.name || "")}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {userSession?.name}
+                        </p>
+                        <p className="text-xs text-base-content/60 truncate">
+                          {userSession?.email}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => signOut()}
+                      className="btn btn-outline btn-sm w-full mt-2">
+                      <LogOut size={16} />
+                      Sign Out
+                    </button>
+                  </li>
+                ) : (
+                  <li>
+                    <GoogleSignInButton />
+                  </li>
+                )}
+              </ul>
+            )}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-600 hover:text-blue-600">
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+          {/* Desktop navigation */}
+          <div className="hidden lg:flex">
+            <ul className="menu menu-horizontal px-1 space-x-2">
+              {navigationItems.map((item) => (
+                <li key={item.name}>
+                  <a
+                    href={item.href}
+                    className="text-sm font-medium hover:text-primary transition-colors">
+                    {item.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t">
-            <div className="flex flex-col space-y-4">
-              <a href="#" className="text-gray-600 hover:text-blue-600">
-                Explore
-              </a>
-              <a href="#" className="text-gray-600 hover:text-blue-600">
-                Upload
-              </a>
-              <a href="#" className="text-gray-600 hover:text-blue-600">
-                Community
-              </a>
-              <div className="flex flex-col space-y-2 pt-4 border-t">
-                <button className="px-4 py-2 text-gray-600 hover:text-blue-600 text-left">
-                  Login
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-purple-600 transition-colors">
-                  Sign Up
-                </button>
+        {/* Center - Logo */}
+        <div className="navbar-center">
+          <a href="/" className="btn btn-ghost text-xl lg:text-2xl font-bold">
+            <span className="bg-gradient-to-r from-primary via-primary/90 to-primary/70 bg-clip-text text-transparent">
+              AkhiloPedia
+            </span>
+          </a>
+        </div>
+
+        {/* Right - User Session */}
+        <div className="navbar-end">
+          {userSession ? (
+            <div className="dropdown dropdown-end">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost btn-circle avatar">
+                <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                  <img
+                    src={userSession?.image}
+                    alt={userSession?.name}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      const nextSibling = e.currentTarget
+                        .nextElementSibling as HTMLDivElement;
+                      if (nextSibling?.style) {
+                        nextSibling.style.display = "flex";
+                      }
+                    }}
+                  />
+                  <div
+                    className="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center text-sm font-medium"
+                    style={{ display: "none" }}>
+                    {getUserInitials(userSession.name)}
+                  </div>
+                </div>
               </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-64 p-2 shadow-lg border">
+                <li className="menu-title">
+                  <div className="flex flex-col">
+                    <span className="font-medium">{userSession.name}</span>
+                    <span className="text-xs text-base-content/60">
+                      {userSession.email}
+                    </span>
+                  </div>
+                </li>
+                <div className="divider my-1"></div>
+                <li>
+                  <a className="flex items-center">
+                    <User2 size={16} />
+                    Profile
+                  </a>
+                </li>
+                <li>
+                  <a className="flex items-center">
+                    <Settings size={16} />
+                    Settings
+                  </a>
+                </li>
+                <div className="divider my-1"></div>
+                <li>
+                  <button
+                    onClick={() => signOut()}
+                    className="text-error hover:bg-error/10 flex items-center">
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </li>
+              </ul>
             </div>
-          </div>
-        )}
+          ) : (
+            <GoogleSignInButton />
+          )}
+        </div>
       </div>
-    </nav>
+    </>
   );
 }
