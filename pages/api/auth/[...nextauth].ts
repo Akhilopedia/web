@@ -13,7 +13,7 @@ export const authOptions = {
     }),
   ],
   pages: {
-    signIn: "/auth/sign-in",
+    signIn: "/",
   },
   callbacks: {
     async redirect({ url, baseUrl }: any) {

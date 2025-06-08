@@ -2,6 +2,7 @@
 
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import GoogleSignInButton from "../SignIn/Google";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,12 +35,10 @@ export default function Header() {
               Community
             </a>
             <div className="flex space-x-4">
-              <button className="px-4 py-2 text-gray-600 hover:text-blue-600 transition-colors">
-                Login
-              </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-purple-600 transition-colors">
-                Sign Up
-              </button>
+              {/* <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                Sign In
+              </button> */}
+              <GoogleSignInButton />
             </div>
           </div>
 
